@@ -94,15 +94,15 @@ func (flatHandler *FlatHandler) GetFlats(ctx *gin.Context) {
 	}
 	neighborhoods_count_from := ctx.DefaultQuery("neighborhoods_count_from", "")
 	if neighborhoods_count_from == "" {
-		filters["neighborhoods_count_from"] = nil
+		filters["neighborhoods_age_from"] = nil
 	} else {
-		filters["neighborhoods_count_from"] = neighborhoods_count_from
+		filters["neighborhoods_age_from"] = neighborhoods_count_from
 	}
 	neighborhoods_count_to := ctx.DefaultQuery("neighborhoods_count_to", "")
 	if neighborhoods_count_to == "" {
-		filters["neighborhoods_count_to"] = nil
+		filters["neighborhoods_age_to"] = nil
 	} else {
-		filters["neighborhoods_count_to"] = neighborhoods_count_to
+		filters["neighborhoods_age_to"] = neighborhoods_count_to
 	}
 	sex := ctx.DefaultQuery("sex", "")
 	if sex == "" {
@@ -187,6 +187,27 @@ func (flatHandler *FlatHandler) InsertFlat(ctx *gin.Context) {
 		return
 	}
 	user := userInt.(*modelsUser.User)
+
+	if !user.IsSuperUser {
+		flats, err := flatHandler.flatService.GetFlats(0, 1, map[string]any{"created_by_id": user.UUID})
+		if err != nil {
+			ctx.AbortWithStatusJSON(http.StatusOK, gin.H{
+				"status": http.StatusInternalServerError,
+				"body":   gin.H{},
+				"error":  "Internal Server Error",
+			})
+			log.Print(err.Error())
+			return
+		}
+		if len(flats) >= 1 {
+			ctx.AbortWithStatusJSON(http.StatusOK, gin.H{
+				"status": http.StatusBadRequest,
+				"body":   gin.H{},
+				"error":  "user already has 1 flat",
+			})
+			return
+		}
+	}
 
 	var flatFromRequest modelsFlat.Flat
 	if err := ctx.ShouldBindBodyWithJSON(&flatFromRequest); err != nil {
