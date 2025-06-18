@@ -92,17 +92,17 @@ func (flatHandler *FlatHandler) GetFlats(ctx *gin.Context) {
 	} else {
 		filters["price_to"] = priceTo
 	}
-	neighborhoods_count_from := ctx.DefaultQuery("neighborhoods_count_from", "")
+	neighborhoods_count_from := ctx.DefaultQuery("neighborhoods_age_from", "")
 	if neighborhoods_count_from == "" {
-		filters["neighborhoods_age_from"] = nil
+		filters["neighborhood_age_from"] = nil
 	} else {
-		filters["neighborhoods_age_from"] = neighborhoods_count_from
+		filters["neighborhood_age_from"] = neighborhoods_count_from
 	}
-	neighborhoods_count_to := ctx.DefaultQuery("neighborhoods_count_to", "")
+	neighborhoods_count_to := ctx.DefaultQuery("neighborhoods_age_to", "")
 	if neighborhoods_count_to == "" {
-		filters["neighborhoods_age_to"] = nil
+		filters["neighborhood_age_to"] = nil
 	} else {
-		filters["neighborhoods_age_to"] = neighborhoods_count_to
+		filters["neighborhood_age_to"] = neighborhoods_count_to
 	}
 	sex := ctx.DefaultQuery("sex", "")
 	if sex == "" {
